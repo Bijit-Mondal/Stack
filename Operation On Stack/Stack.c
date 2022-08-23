@@ -55,7 +55,8 @@ int main(){
                 display();
                 break;
             case 3:
-                printf("Last element is %d\n",peek());
+                if(peek()!=-1)
+                    printf("Last element is %d\n",peek());
                 break;
             case 4:
                 printf("Displaying Element ");
