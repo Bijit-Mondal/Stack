@@ -62,7 +62,7 @@ void PostfixConversion(char ch[]){
         postfix[index++]=temp;
     }
     postfix[++index]='\0';
-    printf("%s",postfix);
+    printf("%s\n",postfix);
 }
 int main(){
     char infinix[50];
