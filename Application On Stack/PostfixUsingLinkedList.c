@@ -1,13 +1,12 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-// #define MAX 50
-// char stack[MAX];
 typedef struct stack{
     char symbol;
     struct stack *next;
 }stack;
 stack *tos = NULL;
+int paranthesis = 0;
 void push(char symbol){
     stack *newStack = (stack *)malloc(sizeof(stack));
     newStack->symbol = symbol;
@@ -53,11 +52,11 @@ int precedence(char ch){
             return -1;
     }
 }
-void PostfixConversion(char ch[]){
+char* PostfixConversion(char* ch){
     int i=0,size,index=0;
-    char postfix[50];
-    char symbol,temp;
     size = strlen(ch);
+    char* postfix=malloc(sizeof(char)*size);
+    char symbol,temp;
     while(i<size){
         symbol = ch[i];
         switch(symbol){
@@ -74,17 +73,21 @@ void PostfixConversion(char ch[]){
                 break;
             case '(':
                 push(symbol);
+                paranthesis++;
                 break;
             case ')':
-                while(1){
-                    if(peek()!='('){
-                        temp = pop();
-                        postfix[index++]=temp;
+                if(paranthesis!=0){
+                    while(1){
+                        if(peek()!='('){
+                            temp = pop();
+                            postfix[index++]=temp;
+                        }
+                        else{
+                            pop();
+                            break;
+                        }
                     }
-                    else{
-                        pop();
-                        break;
-                    }
+                    paranthesis--;
                 }
                 break;
             default:
@@ -98,12 +101,82 @@ void PostfixConversion(char ch[]){
         postfix[index++]=temp;
     }
     postfix[++index]='\0';
-    printf("%s\n",postfix);
+    if(paranthesis == 0)
+        return postfix;
+    else
+        return "Your Equation is seriously damaged!";
+}
+char* PrefixConversion(char* ch){
+    int i=0,size,index=0;
+    size = strlen(ch);
+    char* postfix=malloc(sizeof(char)*size);
+    char symbol,temp;
+    while(i<size){
+        symbol = ch[i];
+        switch(symbol){
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '^':
+                while(precedence(peek())>=precedence(symbol)){
+                    temp = pop();
+                    postfix[index++]=temp;
+                }
+                push(symbol);
+                break;
+            case ')':
+                push(symbol);
+                paranthesis++;
+                break;
+            case '(':
+                if(paranthesis!=0){
+                    while(1){
+                        if(peek()!=')'){
+                            temp = pop();
+                            postfix[index++]=temp;
+                        }
+                        else{
+                            pop();
+                            break;
+                        }
+                    }
+                    paranthesis--;
+                }
+                break;
+            default:
+                postfix[index++]=symbol;
+                break;
+        }
+        i++;
+    }
+    while(tos){
+        temp = pop();
+        postfix[index++]=temp;
+    }
+    postfix[++index]='\0';
+    if(paranthesis == 0)
+        return postfix;
+    else
+        return "Your Equation is seriously damaged!";
+        
+}
+
+char* rev(char str[]){
+    int i,j;
+    int length = strlen(str);
+    char *rev = (char*)malloc(sizeof(char)*length);
+    for(i=(length-1),j=0;i>=0;i--,j++){
+        rev[j] = str[i];
+    }
+    rev[j] = '\0';
+    return rev;
 }
 int main(){
-    char infinix[50];
+    char* infinix=(char*)malloc(sizeof(char));
     printf("Enter the infinix expression : ");
     scanf("%[^\n]%*c",infinix);
-    PostfixConversion(infinix);
+    printf("Postfix : %s\n",PostfixConversion(infinix));
+    printf("Prefix : %s\n",rev(PrefixConversion(rev(infinix))));
     return 0;
 }
